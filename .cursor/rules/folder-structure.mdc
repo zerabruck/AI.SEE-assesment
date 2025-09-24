@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+refere to `assets` folder for any input required to excute a task
+make sure to add any documntation in to the `project_notes` folder
+make sure to add any helping scripts in the `utility` folder
