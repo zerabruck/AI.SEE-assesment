@@ -1,0 +1,43 @@
+ONNX YOLO Inference Log (Ultralytics)
+==================================================
+
+Timestamp: 2025-09-25T08:31:18.521704
+Model Path: output/models/yolo11n.onnx
+Image Path: input/image-2.png
+Device: None
+Inference Time: 0.7764 seconds
+
+Number of detections: 5
+
+Detection Details:
+------------------------------
+Detection 1:
+  Class: giraffe (ID: 23)
+  Confidence: 0.9515
+  Bounding Box: [434.0, 88.8, 757.1, 431.9]
+  Width: 323.1, Height: 343.1
+
+Detection 2:
+  Class: giraffe (ID: 23)
+  Confidence: 0.9483
+  Bounding Box: [94.5, 86.5, 272.2, 442.5]
+  Width: 177.7, Height: 356.0
+
+Detection 3:
+  Class: car (ID: 2)
+  Confidence: 0.9019
+  Bounding Box: [274.8, 283.7, 473.7, 438.9]
+  Width: 198.8, Height: 155.2
+
+Detection 4:
+  Class: car (ID: 2)
+  Confidence: 0.8473
+  Bounding Box: [458.4, 308.0, 538.8, 430.3]
+  Width: 80.5, Height: 122.3
+
+Detection 5:
+  Class: person (ID: 0)
+  Confidence: 0.3133
+  Bounding Box: [315.2, 304.1, 346.1, 329.8]
+  Width: 30.9, Height: 25.7
+

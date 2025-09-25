@@ -1,254 +1,241 @@
-# AI.SEE Assessment - YOLO Model Inference with PyTorch and ONNX
+# AI.SEE Assessment - YOLO Model Inference
 
-This project demonstrates YOLO model inference using both PyTorch and ONNX formats, as part of the AI.SEE assessment. The implementation includes model conversion, inference execution, and comprehensive results comparison.
+This project demonstrates YOLO model inference in both PyTorch and ONNX formats as part of the AI.SEE assessment.
 
-## 🎯 Project Overview
+## Project Overview
 
 The assessment requires:
-1. **PyTorch Inference**: Run inference on `image-2.png` using the provided `yolo11n.pt` model
+1. **PyTorch Inference**: Load and run inference with the provided YOLO model (`yolo11n.pt`)
 2. **ONNX Conversion**: Convert the PyTorch model to ONNX format
 3. **ONNX Inference**: Run inference using the converted ONNX model
-4. **Results Comparison**: Compare and analyze results between both model formats
+4. **Results Comparison**: Compare results between both model formats
 
-## 📁 Project Structure
+## 🚀 Quick Start with Docker (Recommended)
+
+### Prerequisites
+- Docker installed on your system
+- Docker Compose (usually included with Docker Desktop)
+
+### Run Complete Assessment
+```bash
+# Option 1: Using the convenience script
+./run_docker.sh run
+
+# Option 2: Using docker-compose directly
+docker-compose up --build
+```
+
+### Available Commands
+```bash
+# Run complete assessment pipeline
+./run_docker.sh run
+
+# Run individual components
+./run_docker.sh pytorch      # PyTorch inference only
+./run_docker.sh onnx         # ONNX inference only
+./run_docker.sh comparison   # Results comparison only
+./run_docker.sh validation   # Environment validation only
+
+# Development environment
+./run_docker.sh dev          # Interactive development shell
+./run_docker.sh jupyter      # Jupyter Lab (http://localhost:8888)
+
+# Cleanup
+./run_docker.sh clean        # Clean up Docker resources
+```
+
+## 🐍 Local Python Setup (Alternative)
+
+### Prerequisites
+- Python 3.10+
+- Virtual environment support
+
+### Installation
+
+1. **Create and activate virtual environment:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Linux/Mac
+   # or
+   venv\Scripts\activate     # On Windows
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Validate environment:**
+   ```bash
+   python utility/validate_environment.py
+   ```
+
+4. **Run the assessment:**
+   ```bash
+   # Run complete pipeline
+   python pytorch_inference.py
+   python onnx_inference_ultralytics.py
+   python results_comparison.py
+   ```
+
+## Project Structure
 
 ```
 AI.SEE-assessement/
-├── assets/
-│   ├── yolo11n.pt          # PyTorch YOLO model
-│   └── image-2.png         # Test image
-├── output/                 # Generated outputs
-│   ├── pytorch_detections.png
-│   ├── onnx_detections.png
-│   ├── model_comparison.png
-│   ├── pytorch_results.txt
-│   ├── onnx_results.txt
-│   ├── onnx_conversion_report.txt
-│   └── comparison_report.txt
-├── project_notes/          # Documentation
-│   ├── assesment.md
-│   ├── process.md
-│   └── todo.md
-├── utility/               # Helper scripts
-├── venv/                  # Python virtual environment
-├── pytorch_inference.py   # PyTorch inference script
-├── onnx_conversion.py     # ONNX conversion script
-├── onnx_inference.py      # ONNX inference script
-├── results_comparison.py  # Results comparison script
-├── requirements.txt       # Python dependencies
-└── README.md             # This file
+├── input/                    # Input files
+│   ├── yolo11n.pt           # PyTorch YOLO model
+│   └── image-2.png          # Test image
+├── output/                   # Output files
+│   ├── models/              # Converted models
+│   ├── results/             # Inference results
+│   ├── logs/                # Execution logs
+│   └── analysis/            # Comparison reports
+├── utility/                 # Utility functions
+├── project_notes/           # Documentation
+├── requirements.txt         # Dependencies
+├── Dockerfile              # Docker container definition
+├── docker-compose.yml      # Docker Compose configuration
+├── run_docker.sh          # Docker convenience script
+├── DOCKER_GUIDE.md         # Detailed Docker documentation
+└── README.md               # This file
 ```
 
-## 🚀 Quick Start
+## Dependencies
 
-### 1. Environment Setup
+- **Core ML**: torch, torchvision, ultralytics
+- **ONNX**: onnx, onnxruntime
+- **Image Processing**: opencv-python, Pillow
+- **Data Science**: numpy, matplotlib, seaborn
+- **Development**: pytest, jupyter
 
+## Usage
+
+### 🐳 Docker Usage (Recommended)
+
+#### Quick Start
 ```bash
-# Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Linux/Mac
-# or
-venv\Scripts\activate     # On Windows
+# Run complete assessment pipeline
+./run_docker.sh run
 
-# Install dependencies
-pip install -r requirements.txt
+# Or using docker-compose directly
+docker-compose up --build
 ```
 
-### 2. Run PyTorch Inference
-
+#### Individual Components
 ```bash
+# Run specific parts of the assessment
+./run_docker.sh pytorch      # PyTorch inference only
+./run_docker.sh onnx         # ONNX inference only  
+./run_docker.sh comparison   # Results comparison only
+./run_docker.sh validation   # Environment validation only
+```
+
+#### Development Environment
+```bash
+# Interactive development shell
+./run_docker.sh dev
+
+# Jupyter Lab (http://localhost:8888)
+./run_docker.sh jupyter
+```
+
+### 🐍 Local Python Usage
+
+#### Environment Validation
+```bash
+source venv/bin/activate
+python utility/validate_environment.py
+```
+
+#### Running the Assessment
+```bash
+# Run complete pipeline
 python pytorch_inference.py
-```
-
-**Expected Output:**
-- Annotated image: `output/pytorch_detections.png`
-- Results file: `output/pytorch_results.txt`
-- Console output with detection details
-
-### 3. Convert to ONNX
-
-```bash
-python onnx_conversion.py
-```
-
-**Expected Output:**
-- ONNX model: `output/yolo11n.onnx`
-- Conversion report: `output/onnx_conversion_report.txt`
-
-### 4. Run ONNX Inference
-
-```bash
-python onnx_inference.py
-```
-
-**Expected Output:**
-- Annotated image: `output/onnx_detections.png`
-- Results file: `output/onnx_results.txt`
-- Console output with detection details
-
-### 5. Compare Results
-
-```bash
+python onnx_inference_ultralytics.py  
 python results_comparison.py
+
+# Or run individual components
+python pytorch_inference.py              # PyTorch inference
+python onnx_inference_ultralytics.py    # ONNX inference
+python results_comparison.py             # Results comparison
 ```
 
-**Expected Output:**
-- Comparison visualization: `output/model_comparison.png`
-- Comparison report: `output/comparison_report.txt`
+## Assessment Criteria
 
-## 📊 Results Summary
+1. **Completeness**: Successful inference in both PyTorch and ONNX
+2. **Environment Setup**: Clean, isolated development environment
+3. **AI Tool Usage**: Effective use of AI-assisted coding
+4. **Clarity**: Clear documentation and "think aloud" process
+5. **Correctness**: Accurate detection results and proper visualization
 
-### Detection Results
-Both PyTorch and ONNX models successfully detected **5 objects** in the test image:
-- **2 Giraffes** (high confidence: ~0.95)
-- **2 Cars** (high confidence: ~0.85-0.90)
-- **1 Person** (lower confidence: ~0.31)
+## Expected Outputs
 
-### Performance Metrics
-- **Match Rate**: 100% (perfect consistency)
-- **Average Confidence Difference**: 0.0049 (minimal variation)
-- **Detection Count**: Identical (5 detections each)
+- Annotated images with bounding boxes and labels
+- Detection logs with confidence scores and coordinates
+- Performance comparison between PyTorch and ONNX models
+- Comprehensive documentation of the process
 
-### Inference Times
-- **PyTorch**: ~0.91 seconds
-- **ONNX**: ~0.76 seconds (17% faster)
+## Development Status
 
-## 🔧 Technical Implementation
+- ✅ Environment setup and validation
+- ✅ PyTorch inference implementation
+- ✅ ONNX conversion and inference  
+- ✅ Results comparison and documentation
+- ✅ Docker containerization
+- ✅ Complete assessment pipeline
 
-### PyTorch Inference (`pytorch_inference.py`)
-- Uses Ultralytics YOLO API for model loading and inference
-- Implements comprehensive result processing and visualization
-- Generates detailed detection reports with bounding boxes and confidence scores
+## 🐛 Docker Troubleshooting
 
-### ONNX Conversion (`onnx_conversion.py`)
-- Leverages Ultralytics export functionality for seamless conversion
-- Includes model validation and testing
-- Generates detailed conversion reports
+### Common Issues
 
-### ONNX Inference (`onnx_inference.py`)
-- Uses Ultralytics for ONNX model loading and inference
-- Maintains consistency with PyTorch preprocessing pipeline
-- Provides identical output format for easy comparison
+1. **Permission Errors**
+   ```bash
+   # Fix output directory permissions
+   sudo chown -R $USER:$USER output/
+   ```
 
-### Results Comparison (`results_comparison.py`)
-- Implements IoU-based detection matching
-- Calculates similarity metrics and confidence differences
-- Generates comprehensive comparison reports and visualizations
+2. **Memory Issues**
+   ```bash
+   # Increase Docker memory limit in Docker Desktop settings
+   # Or modify docker-compose.yml resource limits
+   ```
 
-## 📈 Key Features
+3. **Build Failures**
+   ```bash
+   # Clean build (no cache)
+   docker-compose build --no-cache
+   
+   # Remove old containers
+   docker-compose down --volumes
+   ```
 
-### ✅ Assessment Requirements Met
-- [x] **PyTorch Model Inference**: Successfully implemented with detailed results
-- [x] **ONNX Model Conversion**: Seamless conversion using Ultralytics
-- [x] **ONNX Model Inference**: Consistent results with PyTorch version
-- [x] **Results Comparison**: Comprehensive analysis and visualization
-- [x] **Environment Setup**: Complete from-scratch setup documentation
-- [x] **Clear Documentation**: Detailed explanations and process documentation
+4. **Port Conflicts**
+   ```bash
+   # Change Jupyter port
+   docker-compose run -p 8889:8888 jupyter
+   ```
 
-### 🎯 Quality Indicators
-- **Consistent Detection Results**: 100% match rate between models
-- **Proper Visualization**: Clear bounding box overlays with labels
-- **Comprehensive Logging**: Detailed inference information and metrics
-- **Clean Code**: Well-documented, modular implementation
+### Debugging Commands
+```bash
+# View container logs
+docker-compose logs ai-see-assessment
 
-## 🛠️ Dependencies
+# Access container shell
+docker-compose exec ai-see-assessment bash
 
-### Core ML Frameworks
-- `torch>=2.0.0` - PyTorch framework
-- `torchvision>=0.15.0` - Computer vision utilities
-- `ultralytics>=8.0.0` - YOLO model implementation
+# Check container status
+docker-compose ps
 
-### ONNX Support
-- `onnx>=1.14.0` - ONNX model format
-- `onnxruntime>=1.15.0` - ONNX inference runtime
+# View resource usage
+docker stats ai-see-assessment
+```
 
-### Image Processing
-- `opencv-python>=4.8.0` - Computer vision operations
-- `Pillow>=9.5.0` - Image processing
-- `numpy>=1.24.0` - Numerical computations
+## 📚 Additional Documentation
 
-### Visualization
-- `matplotlib>=3.7.0` - Plotting and visualization
-- `seaborn>=0.12.0` - Statistical visualization
-
-## 🔍 Technical Details
-
-### Model Information
-- **Model**: YOLO11n (nano version)
-- **Input Size**: 640x640 pixels
-- **Classes**: 80 COCO classes
-- **Framework**: PyTorch → ONNX conversion
-
-### Detection Classes Detected
-- **Giraffe**: Large animals with high confidence
-- **Car**: Vehicles with good confidence
-- **Person**: Human detection with moderate confidence
-
-### Performance Characteristics
-- **PyTorch**: CPU inference, ~0.91s
-- **ONNX**: CPU inference, ~0.76s (17% faster)
-- **Memory**: Efficient model size (~6.5MB PyTorch, ~10.3MB ONNX)
-
-## 📝 Output Files
-
-### Generated Images
-- `pytorch_detections.png` - PyTorch model results with green bounding boxes
-- `onnx_detections.png` - ONNX model results with blue bounding boxes
-- `model_comparison.png` - Side-by-side comparison visualization
-
-### Text Reports
-- `pytorch_results.txt` - Detailed PyTorch inference results
-- `onnx_results.txt` - Detailed ONNX inference results
-- `onnx_conversion_report.txt` - ONNX conversion details
-- `comparison_report.txt` - Comprehensive comparison analysis
-
-## 🎉 Success Criteria
-
-### ✅ Technical Requirements
-- [x] **PyTorch Model Inference**: Meaningful detections with proper visualization
-- [x] **ONNX Conversion**: Successful conversion without errors
-- [x] **ONNX Model Inference**: Comparable results to PyTorch version
-- [x] **Clear Documentation**: Comprehensive setup and execution instructions
-
-### ✅ Quality Indicators
-- [x] **Consistent Results**: 100% match rate between model formats
-- [x] **Proper Visualization**: Clear bounding boxes and labels
-- [x] **Comprehensive Logging**: Detailed inference information
-- [x] **Clean Code**: Well-documented, modular implementation
-
-## 🚀 Future Enhancements
-
-### Potential Improvements
-- **GPU Acceleration**: Enable CUDA support for faster inference
-- **Batch Processing**: Support for multiple images
-- **Model Optimization**: Quantization and pruning for deployment
-- **Web Interface**: Interactive visualization dashboard
-- **Performance Profiling**: Detailed timing and memory analysis
-
-### Additional Features
-- **Video Processing**: Support for video input
-- **Real-time Inference**: Live camera feed processing
-- **Model Comparison**: Multiple model format support
-- **Export Options**: Various output formats (JSON, CSV, etc.)
-
-## 📞 Support
-
-For questions or issues related to this implementation:
-1. Check the generated output files for detailed results
-2. Review the comparison report for analysis insights
-3. Examine the console output for execution details
-
-## 📄 License
-
-This project is part of the AI.SEE assessment and demonstrates proficiency in:
-- YOLO model inference with PyTorch
-- Model conversion to ONNX format
-- ONNX model inference and optimization
-- Results comparison and analysis
-- Comprehensive documentation and testing
+- **[DOCKER_GUIDE.md](DOCKER_GUIDE.md)** - Detailed Docker documentation
+- **[ASSESSMENT_SUMMARY.md](ASSESSMENT_SUMMARY.md)** - Complete assessment results
+- **[project_notes/](project_notes/)** - Project planning and notes
 
 ---
 
-**Assessment Status**: ✅ **COMPLETED SUCCESSFULLY**
-
-All requirements have been met with excellent results showing perfect consistency between PyTorch and ONNX model inference.
+*This project is part of the AI.SEE assessment demonstrating proficiency in YOLO model deployment and ONNX conversion.*

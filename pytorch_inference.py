@@ -1,266 +1,321 @@
 #!/usr/bin/env python3
 """
-PyTorch YOLO Model Inference Script for AI.SEE Assessment
-This script loads a YOLO model and runs inference on an image using PyTorch.
+PyTorch YOLO Model Inference Pipeline for AI.SEE Assessment
+This script demonstrates YOLO model inference using the Ultralytics framework.
 """
 
 import os
 import time
+import json
 import cv2
 import numpy as np
-import torch
-from ultralytics import YOLO
-import matplotlib.pyplot as plt
 from pathlib import Path
-
+from ultralytics import YOLO
+from PIL import Image
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from datetime import datetime
 
 class PyTorchYOLOInference:
-    """Class to handle PyTorch YOLO model inference."""
+    """PyTorch YOLO inference pipeline for AI.SEE assessment."""
     
     def __init__(self, model_path, image_path, output_dir="output"):
         """
-        Initialize the PyTorch YOLO inference.
+        Initialize the PyTorch YOLO inference pipeline.
         
         Args:
-            model_path (str): Path to the PyTorch model file
+            model_path (str): Path to the YOLO model file (.pt)
             image_path (str): Path to the input image
-            output_dir (str): Directory to save outputs
+            output_dir (str): Output directory for results
         """
         self.model_path = model_path
         self.image_path = image_path
         self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+        self.results_dir = self.output_dir / "results"
+        self.logs_dir = self.output_dir / "logs"
         
-        # Load the model
+        # Create output directories
+        self.results_dir.mkdir(parents=True, exist_ok=True)
+        self.logs_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Initialize model
         self.model = None
         self.results = None
         self.inference_time = 0
         
     def load_model(self):
-        """Load the YOLO model and display model information."""
-        print("Loading PyTorch YOLO model...")
-        print(f"Model path: {self.model_path}")
+        """Load the YOLO model from the specified path."""
+        print(f"🔄 Loading YOLO model from: {self.model_path}")
         
         try:
             self.model = YOLO(self.model_path)
-            print("✅ Model loaded successfully!")
-            
-            # Display model information
-            print(f"Model type: {type(self.model.model)}")
-            print(f"Model device: {self.model.device}")
-            
-            # Get model metadata
-            if hasattr(self.model.model, 'names'):
-                print(f"Number of classes: {len(self.model.model.names)}")
-                print(f"Class names: {list(self.model.model.names.values())}")
-            
+            print(f"✅ Model loaded successfully!")
+            print(f"   Model type: {type(self.model.model)}")
+            print(f"   Device: {self.model.device}")
             return True
-            
         except Exception as e:
-            print(f"❌ Error loading model: {e}")
+            print(f"❌ Failed to load model: {e}")
             return False
     
     def preprocess_image(self):
         """Load and preprocess the input image."""
-        print(f"Loading image: {self.image_path}")
+        print(f"🔄 Loading image from: {self.image_path}")
         
         try:
             # Load image using OpenCV
-            image = cv2.imread(self.image_path)
-            if image is None:
+            self.image = cv2.imread(self.image_path)
+            if self.image is None:
                 raise ValueError(f"Could not load image from {self.image_path}")
             
             # Convert BGR to RGB for display
-            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            self.image_rgb = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
             
-            print(f"Image shape: {image.shape}")
-            print(f"Image dtype: {image.dtype}")
-            
-            return image, image_rgb
+            print(f"✅ Image loaded successfully!")
+            print(f"   Image shape: {self.image.shape}")
+            print(f"   Image dtype: {self.image.dtype}")
+            return True
             
         except Exception as e:
-            print(f"❌ Error loading image: {e}")
-            return None, None
+            print(f"❌ Failed to load image: {e}")
+            return False
     
-    def run_inference(self):
-        """Run inference on the image."""
-        print("Running PyTorch inference...")
+    def run_inference(self, conf_threshold=0.25, iou_threshold=0.45):
+        """
+        Run inference on the loaded image.
+        
+        Args:
+            conf_threshold (float): Confidence threshold for detections
+            iou_threshold (float): IoU threshold for NMS
+        """
+        print(f"🔄 Running inference...")
+        print(f"   Confidence threshold: {conf_threshold}")
+        print(f"   IoU threshold: {iou_threshold}")
         
         try:
             start_time = time.time()
             
-            # Run inference using Ultralytics YOLO
-            self.results = self.model(self.image_path)
+            # Run inference using Ultralytics
+            self.results = self.model(
+                self.image_path,
+                conf=conf_threshold,
+                iou=iou_threshold,
+                verbose=False
+            )
             
             self.inference_time = time.time() - start_time
             
-            print(f"✅ Inference completed in {self.inference_time:.4f} seconds")
+            print(f"✅ Inference completed!")
+            print(f"   Inference time: {self.inference_time:.4f} seconds")
+            print(f"   Number of detections: {len(self.results[0].boxes) if self.results[0].boxes is not None else 0}")
+            
             return True
             
         except Exception as e:
-            print(f"❌ Error during inference: {e}")
+            print(f"❌ Inference failed: {e}")
             return False
     
-    def process_results(self):
-        """Process and display the inference results."""
+    def extract_detections(self):
+        """Extract detection results from the model output."""
         if self.results is None:
-            print("❌ No results to process")
+            print("❌ No inference results available")
             return None
         
-        print("\n" + "="*50)
-        print("PYTORCH INFERENCE RESULTS")
-        print("="*50)
+        detections = []
+        result = self.results[0]  # Get first (and only) result
         
-        # Process each result
-        all_detections = []
-        
-        for i, result in enumerate(self.results):
-            print(f"\nResult {i+1}:")
+        if result.boxes is not None and len(result.boxes) > 0:
+            boxes = result.boxes.xyxy.cpu().numpy()  # x1, y1, x2, y2
+            confidences = result.boxes.conf.cpu().numpy()
+            class_ids = result.boxes.cls.cpu().numpy().astype(int)
+            class_names = result.names
             
-            # Get detection data
-            if result.boxes is not None:
-                boxes = result.boxes.xyxy.cpu().numpy()  # x1, y1, x2, y2
-                confidences = result.boxes.conf.cpu().numpy()
-                class_ids = result.boxes.cls.cpu().numpy().astype(int)
-                
-                print(f"Number of detections: {len(boxes)}")
-                
-                if len(boxes) > 0:
-                    print("\nDetections:")
-                    print("-" * 80)
-                    print(f"{'Class':<15} {'Confidence':<12} {'BBox (x1,y1,x2,y2)':<25} {'Area':<10}")
-                    print("-" * 80)
-                    
-                    for j, (box, conf, cls_id) in enumerate(zip(boxes, confidences, class_ids)):
-                        class_name = self.model.names[cls_id] if cls_id in self.model.names else f"Class_{cls_id}"
-                        area = (box[2] - box[0]) * (box[3] - box[1])
-                        
-                        print(f"{class_name:<15} {conf:<12.4f} {str(box):<25} {area:<10.1f}")
-                        
-                        all_detections.append({
-                            'class_name': class_name,
-                            'confidence': float(conf),
-                            'bbox': box.tolist(),
-                            'area': float(area)
-                        })
-                else:
-                    print("No objects detected")
-            else:
-                print("No detection results available")
+            for i, (box, conf, cls_id) in enumerate(zip(boxes, confidences, class_ids)):
+                detection = {
+                    'id': i,
+                    'bbox': {
+                        'x1': float(box[0]),
+                        'y1': float(box[1]),
+                        'x2': float(box[2]),
+                        'y2': float(box[3]),
+                        'width': float(box[2] - box[0]),
+                        'height': float(box[3] - box[1])
+                    },
+                    'confidence': float(conf),
+                    'class_id': int(cls_id),
+                    'class_name': class_names[cls_id]
+                }
+                detections.append(detection)
         
-        return all_detections
+        print(f"📊 Extracted {len(detections)} detections")
+        return detections
     
-    def visualize_results(self, image_rgb, detections):
-        """Create visualization of the detection results."""
-        print("Creating visualization...")
+    def visualize_results(self, save_path=None):
+        """Create visualization of detection results."""
+        if self.results is None:
+            print("❌ No results to visualize")
+            return None
+        
+        print("🔄 Creating visualization...")
         
         try:
-            # Create a copy of the image for annotation
-            annotated_image = image_rgb.copy()
+            # Create figure
+            fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+            ax.imshow(self.image_rgb)
+            ax.set_title(f'PyTorch YOLO Detections (Inference Time: {self.inference_time:.4f}s)', 
+                        fontsize=14, fontweight='bold')
             
-            # Draw bounding boxes and labels
-            for detection in detections:
-                bbox = detection['bbox']
-                class_name = detection['class_name']
-                confidence = detection['confidence']
-                
-                # Convert to integer coordinates
-                x1, y1, x2, y2 = map(int, bbox)
-                
-                # Draw bounding box
-                cv2.rectangle(annotated_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                
-                # Draw label
-                label = f"{class_name}: {confidence:.2f}"
-                label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
-                
-                # Draw label background
-                cv2.rectangle(annotated_image, (x1, y1 - label_size[1] - 10), 
-                             (x1 + label_size[0], y1), (0, 255, 0), -1)
-                
-                # Draw label text
-                cv2.putText(annotated_image, label, (x1, y1 - 5), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+            # Get detections
+            detections = self.extract_detections()
             
-            # Save the annotated image
-            output_path = self.output_dir / "pytorch_detections.png"
-            cv2.imwrite(str(output_path), cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
-            print(f"✅ Annotated image saved to: {output_path}")
+            if detections:
+                # Color map for different classes
+                colors = plt.cm.Set3(np.linspace(0, 1, len(set(d['class_id'] for d in detections))))
+                class_colors = {cls_id: colors[i] for i, cls_id in enumerate(set(d['class_id'] for d in detections))}
+                
+                for detection in detections:
+                    bbox = detection['bbox']
+                    x1, y1, x2, y2 = bbox['x1'], bbox['y1'], bbox['x2'], bbox['y2']
+                    
+                    # Create rectangle
+                    rect = patches.Rectangle(
+                        (x1, y1), x2-x1, y2-y1,
+                        linewidth=2,
+                        edgecolor=class_colors[detection['class_id']],
+                        facecolor='none'
+                    )
+                    ax.add_patch(rect)
+                    
+                    # Add label
+                    label = f"{detection['class_name']}: {detection['confidence']:.2f}"
+                    ax.text(x1, y1-5, label, 
+                           bbox=dict(boxstyle="round,pad=0.3", facecolor=class_colors[detection['class_id']], alpha=0.7),
+                           fontsize=10, fontweight='bold')
             
-            return annotated_image
+            ax.axis('off')
+            plt.tight_layout()
+            
+            # Save visualization
+            if save_path is None:
+                save_path = self.results_dir / "pytorch_results.png"
+            
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            print(f"✅ Visualization saved to: {save_path}")
+            
+            plt.show()
+            return save_path
             
         except Exception as e:
-            print(f"❌ Error creating visualization: {e}")
+            print(f"❌ Visualization failed: {e}")
             return None
     
-    def save_results(self, detections):
-        """Save detailed results to a text file."""
-        try:
-            results_file = self.output_dir / "pytorch_results.txt"
-            
-            with open(results_file, 'w') as f:
-                f.write("PYTORCH YOLO INFERENCE RESULTS\n")
-                f.write("="*50 + "\n\n")
-                f.write(f"Model: {self.model_path}\n")
-                f.write(f"Image: {self.image_path}\n")
-                f.write(f"Inference time: {self.inference_time:.4f} seconds\n")
-                f.write(f"Number of detections: {len(detections)}\n\n")
-                
-                if detections:
-                    f.write("DETECTION DETAILS:\n")
-                    f.write("-" * 80 + "\n")
-                    f.write(f"{'Class':<15} {'Confidence':<12} {'BBox (x1,y1,x2,y2)':<25} {'Area':<10}\n")
-                    f.write("-" * 80 + "\n")
-                    
-                    for detection in detections:
-                        f.write(f"{detection['class_name']:<15} {detection['confidence']:<12.4f} "
-                               f"{str(detection['bbox']):<25} {detection['area']:<10.1f}\n")
-                else:
-                    f.write("No objects detected\n")
-            
-            print(f"✅ Results saved to: {results_file}")
-            
-        except Exception as e:
-            print(f"❌ Error saving results: {e}")
-    
-    def run_complete_inference(self):
-        """Run the complete inference pipeline."""
-        print("Starting PyTorch YOLO Inference Pipeline")
-        print("="*50)
+    def save_results(self):
+        """Save detection results to JSON file."""
+        detections = self.extract_detections()
         
-        # Load model
+        if detections is None:
+            print("❌ No detections to save")
+            return None
+        
+        # Prepare results data
+        results_data = {
+            'model_info': {
+                'model_path': str(self.model_path),
+                'model_type': 'PyTorch YOLO',
+                'framework': 'Ultralytics',
+                'device': str(self.model.device),
+                'inference_time': self.inference_time
+            },
+            'image_info': {
+                'image_path': str(self.image_path),
+                'image_shape': self.image.shape,
+                'image_dtype': str(self.image.dtype)
+            },
+            'detection_summary': {
+                'total_detections': len(detections),
+                'confidence_threshold': 0.25,
+                'timestamp': datetime.now().isoformat()
+            },
+            'detections': detections
+        }
+        
+        # Save to JSON
+        json_path = self.results_dir / "pytorch_detections.json"
+        with open(json_path, 'w') as f:
+            json.dump(results_data, f, indent=2)
+        
+        print(f"✅ Results saved to: {json_path}")
+        return json_path
+    
+    def log_inference_details(self):
+        """Log detailed inference information."""
+        log_path = self.logs_dir / "pytorch_inference.log"
+        
+        with open(log_path, 'w') as f:
+            f.write("PyTorch YOLO Inference Log\n")
+            f.write("=" * 50 + "\n\n")
+            f.write(f"Timestamp: {datetime.now().isoformat()}\n")
+            f.write(f"Model Path: {self.model_path}\n")
+            f.write(f"Image Path: {self.image_path}\n")
+            f.write(f"Device: {self.model.device}\n")
+            f.write(f"Inference Time: {self.inference_time:.4f} seconds\n\n")
+            
+            if self.results:
+                result = self.results[0]
+                f.write(f"Number of detections: {len(result.boxes) if result.boxes is not None else 0}\n")
+                
+                if result.boxes is not None and len(result.boxes) > 0:
+                    f.write("\nDetection Details:\n")
+                    f.write("-" * 30 + "\n")
+                    
+                    boxes = result.boxes.xyxy.cpu().numpy()
+                    confidences = result.boxes.conf.cpu().numpy()
+                    class_ids = result.boxes.cls.cpu().numpy().astype(int)
+                    class_names = result.names
+                    
+                    for i, (box, conf, cls_id) in enumerate(zip(boxes, confidences, class_ids)):
+                        f.write(f"Detection {i+1}:\n")
+                        f.write(f"  Class: {class_names[cls_id]} (ID: {cls_id})\n")
+                        f.write(f"  Confidence: {conf:.4f}\n")
+                        f.write(f"  Bounding Box: [{box[0]:.1f}, {box[1]:.1f}, {box[2]:.1f}, {box[3]:.1f}]\n")
+                        f.write(f"  Width: {box[2]-box[0]:.1f}, Height: {box[3]-box[1]:.1f}\n\n")
+        
+        print(f"✅ Inference log saved to: {log_path}")
+        return log_path
+    
+    def run_full_pipeline(self):
+        """Run the complete PyTorch inference pipeline."""
+        print("🚀 Starting PyTorch YOLO Inference Pipeline")
+        print("=" * 60)
+        
+        # Step 1: Load model
         if not self.load_model():
             return False
         
-        # Load and preprocess image
-        image, image_rgb = self.preprocess_image()
-        if image is None:
+        # Step 2: Preprocess image
+        if not self.preprocess_image():
             return False
         
-        # Run inference
+        # Step 3: Run inference
         if not self.run_inference():
             return False
         
-        # Process results
-        detections = self.process_results()
+        # Step 4: Extract and save results
+        self.save_results()
         
-        # Create visualization
-        if detections:
-            self.visualize_results(image_rgb, detections)
+        # Step 5: Create visualization
+        self.visualize_results()
         
-        # Save results
-        self.save_results(detections)
+        # Step 6: Log details
+        self.log_inference_details()
         
         print("\n✅ PyTorch inference pipeline completed successfully!")
         return True
 
-
 def main():
     """Main function to run PyTorch inference."""
     # Define paths
-    model_path = "assets/yolo11n.pt"
-    image_path = "assets/image-2.png"
-    output_dir = "output"
+    model_path = "input/yolo11n.pt"
+    image_path = "input/image-2.png"
     
     # Check if files exist
     if not os.path.exists(model_path):
@@ -271,17 +326,15 @@ def main():
         print(f"❌ Image file not found: {image_path}")
         return
     
-    # Create inference instance
-    inference = PyTorchYOLOInference(model_path, image_path, output_dir)
-    
-    # Run complete inference
-    success = inference.run_complete_inference()
+    # Initialize and run inference
+    inference = PyTorchYOLOInference(model_path, image_path)
+    success = inference.run_full_pipeline()
     
     if success:
         print("\n🎉 PyTorch inference completed successfully!")
+        print("Check the 'output/results/' directory for visualization and results.")
     else:
         print("\n❌ PyTorch inference failed!")
-
 
 if __name__ == "__main__":
     main()

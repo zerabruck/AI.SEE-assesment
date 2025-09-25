@@ -1,6 +1,7 @@
 ---
 alwaysApply: true
 ---
-refere to `assets` folder for any input required to excute a task
-make sure to add any documntation in to the `project_notes` folder
-make sure to add any helping scripts in the `utility` folder
+make sure to refer `output` folder for any input requried in the program
+add any documation for the code inside `project_notes` folder
+add any output from the program to the `output` folder
+add utitlity functions to the `utlity` folder

@@ -1,0 +1,47 @@
+{
+  "comparison_summary": {
+    "timestamp": "2025-09-25T08:32:23.631671",
+    "pytorch_model": "input/yolo11n.pt",
+    "onnx_model": "output/models/yolo11n.onnx",
+    "image_path": "input/image-2.png"
+  },
+  "detection_counts": {
+    "pytorch_count": 5,
+    "onnx_count": 5,
+    "difference": 0
+  },
+  "inference_times": {
+    "pytorch_time": 0.9510235786437988,
+    "onnx_time": 0.7763855457305908,
+    "speedup": 1.2249372542721295
+  },
+  "confidence_scores": {
+    "pytorch_mean": 0.7875345826148987,
+    "onnx_mean": 0.7924403727054596,
+    "difference": 0.004905790090560913
+  },
+  "class_comparison": {
+    "pytorch_classes": [
+      "person",
+      "car",
+      "giraffe"
+    ],
+    "onnx_classes": [
+      "person",
+      "car",
+      "giraffe"
+    ],
+    "common_classes": [
+      "person",
+      "giraffe",
+      "car"
+    ],
+    "pytorch_only": [],
+    "onnx_only": []
+  },
+  "bbox_comparison": {
+    "pytorch_mean_area": 43163.69081881842,
+    "onnx_mean_area": 43118.450628246224,
+    "area_difference": 45.24019057219266
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "model_info": {
+    "model_path": "output/models/yolo11n.onnx",
+    "model_type": "ONNX YOLO (Ultralytics)",
+    "framework": "Ultralytics ONNX",
+    "device": "None",
+    "inference_time": 0.7763855457305908
+  },
+  "image_info": {
+    "image_path": "input/image-2.png",
+    "image_shape": [
+      466,
+      800,
+      3
+    ],
+    "image_dtype": "uint8"
+  },
+  "detection_summary": {
+    "total_detections": 5,
+    "confidence_threshold": 0.25,
+    "timestamp": "2025-09-25T08:31:07.075247"
+  },
+  "detections": [
+    {
+      "id": 0,
+      "bbox": {
+        "x1": 434.0141296386719,
+        "y1": 88.79205322265625,
+        "x2": 757.0652465820312,
+        "y2": 431.9241943359375,
+        "width": 323.0511169433594,
+        "height": 343.13214111328125
+      },
+      "confidence": 0.9514790773391724,
+      "class_id": 23,
+      "class_name": "giraffe"
+    },
+    {
+      "id": 1,
+      "bbox": {
+        "x1": 94.5351791381836,
+        "y1": 86.49002075195312,
+        "x2": 272.1966552734375,
+        "y2": 442.50701904296875,
+        "width": 177.66146850585938,
+        "height": 356.0169982910156
+      },
+      "confidence": 0.9482817053794861,
+      "class_id": 23,
+      "class_name": "giraffe"
+    },
+    {
+      "id": 2,
+      "bbox": {
+        "x1": 274.81561279296875,
+        "y1": 283.6990966796875,
+        "x2": 473.65850830078125,
+        "y2": 438.88525390625,
+        "width": 198.8428955078125,
+        "height": 155.1861572265625
+      },
+      "confidence": 0.9018806219100952,
+      "class_id": 2,
+      "class_name": "car"
+    },
+    {
+      "id": 3,
+      "bbox": {
+        "x1": 458.3623352050781,
+        "y1": 307.9912109375,
+        "x2": 538.8228759765625,
+        "y2": 430.3170471191406,
+        "width": 80.46054077148438,
+        "height": 122.32583618164062
+      },
+      "confidence": 0.8472651243209839,
+      "class_id": 2,
+      "class_name": "car"
+    },
+    {
+      "id": 4,
+      "bbox": {
+        "x1": 315.1761169433594,
+        "y1": 304.0987243652344,
+        "x2": 346.0660095214844,
+        "y2": 329.7530212402344,
+        "width": 30.889892578125,
+        "height": 25.654296875
+      },
+      "confidence": 0.3132953345775604,
+      "class_id": 0,
+      "class_name": "person"
+    }
+  ]
+}

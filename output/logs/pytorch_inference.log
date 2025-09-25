@@ -1,0 +1,43 @@
+PyTorch YOLO Inference Log
+==================================================
+
+Timestamp: 2025-09-25T06:11:50.258092
+Model Path: input/yolo11n.pt
+Image Path: input/image-2.png
+Device: cpu
+Inference Time: 0.2729 seconds
+
+Number of detections: 5
+
+Detection Details:
+------------------------------
+Detection 1:
+  Class: giraffe (ID: 23)
+  Confidence: 0.9491
+  Bounding Box: [434.1, 90.2, 757.0, 433.3]
+  Width: 323.0, Height: 343.1
+
+Detection 2:
+  Class: giraffe (ID: 23)
+  Confidence: 0.9451
+  Bounding Box: [94.6, 87.9, 272.3, 444.3]
+  Width: 177.7, Height: 356.4
+
+Detection 3:
+  Class: car (ID: 2)
+  Confidence: 0.8884
+  Bounding Box: [274.8, 284.9, 473.7, 440.9]
+  Width: 198.8, Height: 156.0
+
+Detection 4:
+  Class: car (ID: 2)
+  Confidence: 0.8480
+  Bounding Box: [458.4, 309.2, 539.0, 431.7]
+  Width: 80.6, Height: 122.5
+
+Detection 5:
+  Class: person (ID: 0)
+  Confidence: 0.3070
+  Bounding Box: [315.1, 305.3, 346.1, 331.1]
+  Width: 31.0, Height: 25.7
+

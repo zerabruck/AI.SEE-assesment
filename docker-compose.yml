@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  ai-see-assessment:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-see-assessment
+    volumes:
+      # Mount input files
+      - ./customIN:/app/input:ro
+      # Mount output directory for results
+      - ./customOut:/app/output
+      # Mount project notes for documentation
+      - ./customProj:/app/project_notes:ro
+    environment:
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=""  # Force CPU usage
+    working_dir: /app
+    # Override default command to run full assessment pipeline
+    command: >
+      bash -c "
+        echo '🚀 Starting AI.SEE Assessment Pipeline' &&
+        echo '=====================================' &&
+        python utility/validate_environment.py &&
+        echo '' &&
+        echo '📊 Running PyTorch Inference...' &&
+        python pytorch_inference.py &&
+        echo '' &&
+        echo '🔄 Converting to ONNX...' &&
+        python -c 'from ultralytics import YOLO; model = YOLO(\"input/yolo11n.pt\"); model.export(format=\"onnx\", imgsz=640); print(\"✅ ONNX conversion completed\")' &&
+        mv input/yolo11n.onnx output/models/ &&
+        echo '' &&
+        echo '📊 Running ONNX Inference...' &&
+        python onnx_inference_ultralytics.py &&
+        echo '' &&
+        echo '📈 Comparing Results...' &&
+        python results_comparison.py &&
+        echo '' &&
+        echo '🎉 AI.SEE Assessment Complete!' &&
+        echo 'Check the output/ directory for all results.'
+      "
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+
+  # Optional: Jupyter notebook service for interactive development
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-see-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/app
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    command: >
+      bash -c "
+        jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
+      "
+    profiles:
+      - development
+
+  # Optional: Development service with live code reloading
+  development:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-see-dev
+    volumes:
+      - ./:/app
+    environment:
+      - PYTHONPATH=/app
+    command: >
+      bash -c "
+        echo '🔧 Development Environment Ready' &&
+        echo 'Available commands:' &&
+        echo '  python pytorch_inference.py' &&
+        echo '  python onnx_inference_ultralytics.py' &&
+        echo '  python results_comparison.py' &&
+        echo '  python utility/validate_environment.py' &&
+        echo '' &&
+        echo 'Starting interactive shell...' &&
+        bash
+      "
+    profiles:
+      - development
+
+networks:
+  default:
+    name: ai-see-network
