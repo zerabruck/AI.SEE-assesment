@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+refer to `input` folder the program intial input
+make sure to add into `project_notes` for any documntaion for the program
+make sure to add the reuslt for the program into `output` folder
+if there is any helping function make sure to add it into `utility` folder

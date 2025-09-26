@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  yolo-assessment:
+    build: .
+    container_name: yolo-assessment
+    volumes:
+      # Mount input directory for models and images
+      - ./input:/app/input:ro
+      # Mount output directory for results
+      - ./output:/app/output
+      # Mount project notes for documentation
+      - ./project_notes:/app/project_notes:ro
+      # Mount utility functions
+      - ./utility:/app/utility:ro
+    environment:
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=""  # Force CPU usage
+    working_dir: /app
+    # Override default command to run the full assessment pipeline
+    command: >
+      sh -c "
+        echo 'Starting YOLO Assessment Pipeline...' &&
+        echo 'Step 1: PyTorch Inference' &&
+        python pytorch_inference.py &&
+        echo 'Step 2: ONNX Conversion' &&
+        python onnx_conversion.py &&
+        echo 'Step 3: ONNX Inference' &&
+        python onnx_inference.py &&
+        echo 'Step 4: Results Comparison' &&
+        python results_comparison.py &&
+        echo 'Assessment completed successfully!' &&
+        echo 'Results available in ./output directory'
+      "
+    # Keep container running to inspect results
+    tty: true
+    stdin_open: true
+
+  # Alternative service for running individual steps
+  pytorch-inference:
+    build: .
+    container_name: pytorch-inference
+    volumes:
+      - ./input:/app/input:ro
+      - ./output:/app/output
+      - ./utility:/app/utility:ro
+    environment:
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=""
+    working_dir: /app
+    command: python pytorch_inference.py
+    profiles:
+      - pytorch
+
+  onnx-conversion:
+    build: .
+    container_name: onnx-conversion
+    volumes:
+      - ./input:/app/input:ro
+      - ./output:/app/output
+      - ./utility:/app/utility:ro
+    environment:
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=""
+    working_dir: /app
+    command: python onnx_conversion.py
+    profiles:
+      - conversion
+
+  onnx-inference:
+    build: .
+    container_name: onnx-inference
+    volumes:
+      - ./input:/app/input:ro
+      - ./output:/app/output
+      - ./utility:/app/utility:ro
+    environment:
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=""
+    working_dir: /app
+    command: python onnx_inference.py
+    profiles:
+      - onnx
+
+  results-comparison:
+    build: .
+    container_name: results-comparison
+    volumes:
+      - ./input:/app/input:ro
+      - ./output:/app/output
+      - ./utility:/app/utility:ro
+    environment:
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=""
+    working_dir: /app
+    command: python results_comparison.py
+    profiles:
+      - comparison
+
+  # Development service with interactive shell
+  dev:
+    build: .
+    container_name: yolo-dev
+    volumes:
+      - ./:/app
+    environment:
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=""
+    working_dir: /app
+    command: /bin/bash
+    tty: true
+    stdin_open: true
+    profiles:
+      - dev
+
+  # Jupyter notebook service for interactive development
+  jupyter:
+    build: .
+    container_name: yolo-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/app
+    environment:
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=""
+    working_dir: /app
+    command: >
+      sh -c "
+        pip install jupyter notebook &&
+        jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --notebook-dir=/app
+      "
+    profiles:
+      - jupyter

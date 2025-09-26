@@ -1,0 +1,61 @@
+PyTorch vs ONNX Model Comparison Report
+==================================================
+
+EXECUTIVE SUMMARY
+--------------------
+PyTorch Model Detections: 4
+ONNX Model Detections: 4
+Matched Detections: 4
+PyTorch Only: 0
+ONNX Only: 0
+IoU Threshold: 0.5
+
+PERFORMANCE COMPARISON
+-------------------------
+PyTorch Inference Time: 0.6909 seconds
+ONNX Inference Time: 0.7182 seconds
+ONNX Speedup: 0.96x
+
+CLASS-WISE ANALYSIS
+--------------------
+giraffe:
+  PyTorch: 2 detections
+  ONNX: 2 detections
+  Difference: +0
+
+car:
+  PyTorch: 2 detections
+  ONNX: 2 detections
+  Difference: +0
+
+CONFIDENCE SCORE ANALYSIS
+------------------------------
+Match 1 (giraffe):
+  PyTorch Confidence: 0.9491
+  ONNX Confidence: 0.9491
+  IoU: 1.0000
+  Confidence Difference: 0.0000
+
+Match 2 (giraffe):
+  PyTorch Confidence: 0.9451
+  ONNX Confidence: 0.9451
+  IoU: 1.0000
+  Confidence Difference: 0.0000
+
+Match 3 (car):
+  PyTorch Confidence: 0.8884
+  ONNX Confidence: 0.8884
+  IoU: 1.0000
+  Confidence Difference: 0.0000
+
+Match 4 (car):
+  PyTorch Confidence: 0.8480
+  ONNX Confidence: 0.8480
+  IoU: 1.0000
+  Confidence Difference: 0.0000
+
+CONCLUSIONS
+------------
+• Match Rate: 100.00% of detections have corresponding matches
+• PyTorch model is 1.04x faster than ONNX model
+• Both models detected the same number of objects

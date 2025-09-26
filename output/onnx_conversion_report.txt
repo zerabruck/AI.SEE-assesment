@@ -1,0 +1,23 @@
+YOLO PyTorch to ONNX Conversion Report
+==================================================
+
+Conversion Information:
+-------------------------
+Source Model: input/yolo11n.pt
+ONNX Model: input/yolo11n.onnx
+Conversion Time: N/A seconds
+Model Size: 10.42 MB
+Opset Version: 11
+
+Model Architecture:
+--------------------
+Input Shape: ['dynamic', 3, 'dynamic', 'dynamic']
+Output Shape: ['dynamic', 84, 'dynamic']
+
+ONNX Runtime Information:
+-------------------------
+Input Name: images
+Input Shape: ['batch', 3, 'height', 'width']
+Output Names: ['output0']
+Output Shapes: [['batch', 84, 'anchors']]
+Test Successful: True

@@ -1,0 +1,33 @@
+YOLO ONNX Inference Results
+========================================
+
+Inference Time: 0.7182 seconds
+Number of Detections: 4
+Confidence Threshold: 0.5
+
+Detections:
+--------------------
+Detection 1:
+  Class: giraffe
+  Confidence: 0.9491
+  Bounding Box: [434.1, 90.2, 757.0, 433.3]
+  Width: 323.0, Height: 343.1
+
+Detection 2:
+  Class: giraffe
+  Confidence: 0.9451
+  Bounding Box: [94.6, 87.9, 272.3, 444.3]
+  Width: 177.7, Height: 356.4
+
+Detection 3:
+  Class: car
+  Confidence: 0.8884
+  Bounding Box: [274.8, 284.9, 473.7, 440.9]
+  Width: 198.8, Height: 156.0
+
+Detection 4:
+  Class: car
+  Confidence: 0.8480
+  Bounding Box: [458.4, 309.2, 539.0, 431.7]
+  Width: 80.6, Height: 122.5
+

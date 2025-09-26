@@ -1,0 +1,21 @@
+2025-09-26 09:51:40,730 - INFO - Starting YOLO PyTorch to ONNX conversion...
+2025-09-26 09:51:40,731 - INFO - Using device: cpu
+2025-09-26 09:51:40,731 - INFO - Loading YOLO model from: input/yolo11n.pt
+2025-09-26 09:51:40,855 - INFO - Model loaded successfully
+2025-09-26 09:51:40,855 - INFO - Starting ONNX conversion...
+2025-09-26 09:51:40,855 - INFO - Exporting model to ONNX format...
+2025-09-26 09:51:40,856 - INFO - Parameters: imgsz=640, half=False, dynamic=True, simplify=True, opset=11
+2025-09-26 09:51:54,666 - INFO - ONNX conversion completed in 13.8105 seconds
+2025-09-26 09:51:54,666 - INFO - ONNX model saved to: input/yolo11n.onnx
+2025-09-26 09:51:54,666 - INFO - Validating ONNX model: input/yolo11n.onnx
+2025-09-26 09:51:54,748 - INFO - ONNX model validation passed
+2025-09-26 09:51:54,749 - INFO - Model size: 10.42 MB
+2025-09-26 09:51:54,749 - INFO - Input shape: ['dynamic', 3, 'dynamic', 'dynamic']
+2025-09-26 09:51:54,750 - INFO - Output shape: ['dynamic', 84, 'dynamic']
+2025-09-26 09:51:54,750 - INFO - Opset version: 11
+2025-09-26 09:51:54,750 - INFO - Testing ONNX inference with: input/image-2.png
+2025-09-26 09:51:54,919 - INFO - ONNX Runtime input: images, shape: ['batch', 3, 'height', 'width']
+2025-09-26 09:51:54,919 - INFO - ONNX Runtime output 0: output0, shape: ['batch', 84, 'anchors']
+2025-09-26 09:51:55,601 - INFO - ONNX model test inference successful
+2025-09-26 09:51:55,622 - INFO - Conversion report saved to: output/onnx_conversion_report.txt
+2025-09-26 09:51:55,622 - INFO - ONNX conversion completed successfully!

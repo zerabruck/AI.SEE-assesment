@@ -1,0 +1,14 @@
+2025-09-26 09:48:39,697 - INFO - Starting PyTorch YOLO inference...
+2025-09-26 09:48:39,698 - INFO - Using device: cpu
+2025-09-26 09:48:39,698 - INFO - Loading YOLO model from: input/yolo11n.pt
+2025-09-26 09:48:40,154 - INFO - Model loaded successfully
+2025-09-26 09:48:40,155 - INFO - Model type: <class 'ultralytics.nn.tasks.DetectionModel'>
+2025-09-26 09:48:40,155 - INFO - Number of classes: 80
+2025-09-26 09:48:40,155 - INFO - Class names: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+2025-09-26 09:48:40,155 - INFO - Running inference on: input/image-2.png
+2025-09-26 09:48:40,846 - INFO - Inference completed in 0.6909 seconds
+2025-09-26 09:48:40,848 - INFO - Found 4 detections
+2025-09-26 09:48:40,849 - INFO - Results saved to: output/pytorch_results.txt
+2025-09-26 09:48:40,864 - INFO - Image loaded: (466, 800, 3)
+2025-09-26 09:48:42,798 - INFO - Visualization saved to: output/pytorch_detections.png
+2025-09-26 09:48:42,798 - INFO - PyTorch inference completed successfully!
